@@ -422,3 +422,44 @@ BenchmarkHandleProduct-4     63             10             -84.13%
 benchmark                    old bytes     new bytes     delta
 BenchmarkHandleProduct-4     4976          1136          -77.17%
 ```
+### Disable Set Header
+```golang
+// w.Header().Set("Content-Type", "text/html; charset=utf-8")
+```
+
+```sh
+benchcmp prof3 prof4
+benchmark                    old ns/op     new ns/op     delta
+BenchmarkHandleProduct-4     2059          2077          +0.87%
+
+benchmark                    old allocs     new allocs     delta
+BenchmarkHandleProduct-4     10             10             +0.00%
+
+benchmark                    old bytes     new bytes     delta
+BenchmarkHandleProduct-4     1136          1136          +0.00%
+```
+
+but no more memory allocation for set header
+```sh
+go tool pprof --alloc_space benchmark.test prof.mem
+File: benchmark.test
+Type: alloc_space
+Time: Nov 9, 2018 at 4:17am (WIB)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) list handleP
+Total: 11.53GB
+ROUTINE ======================== github.com/w-bt/benchmark.handleProduct in /home/nakama/Code/go/src/github.com/w-bt/benchmark/main.go
+    1.29GB     9.22GB (flat, cum) 79.97% of Total
+         .          .     34:		http.Error(w, "Data Not Found", http.StatusBadRequest)
+         .          .     35:		return
+         .          .     36:	}
+         .          .     37:
+         .          .     38:	// w.Header().Set("Content-Type", "text/html; charset=utf-8")
+    1.29GB     9.22GB     39:	w.Write([]byte(`<font size="10">Product Code : ` + result.Code + ` Name :` + result.Name + `</font>`))
+         .          .     40:}
+         .          .     41:
+         .          .     42:func findProduct(Products map[string]*Product, code string) Product {
+         .          .     43:	if v, ok := Products[code]; ok {
+         .          .     44:		return *v
+(pprof) exit
+```
