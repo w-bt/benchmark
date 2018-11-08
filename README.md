@@ -339,3 +339,11 @@ ROUTINE ======================== regexp.MatchString in /usr/local/go/src/regexp/
 (pprof) web handleProduct
 ```
 ![mem profile](./pprof004.svg)
+
+### Another Way
+
+Use Web Version!!!! Open `localhost:8081`
+
+```sh
+$ go tool pprof -http=":8081" [binary] [profile]
+```
