@@ -5,9 +5,10 @@ Sharing Session Benchmark and Optimizing Code on 09 November 2018 - Tokopedia To
 ### Requirements
 
   - Golang 1.11 or newer
+  - Golang x tools (sudo apt install golang-golang-x-tools)
   - Any editor (vscode or atom)
   
-### Test Case
+# Test Case
 
 ```golang
 package main
@@ -125,7 +126,7 @@ func BenchmarkHandleProduct(b *testing.B) {
 }
 ```
 ```sh
-$ go test -v -run=^$ -bench=. -benchtime=10s -cpuprofile=prof.cpu -memprofile=prof.mem
+$ go test -v -run=^$ -bench=. -benchtime=10s -cpuprofile=prof.cpu -memprofile=prof.mem | tee prof1
 goos: linux
 goarch: amd64
 pkg: github.com/w-bt/benchmark
@@ -346,4 +347,69 @@ Use Web Version!!!! Open `localhost:8081`
 
 ```sh
 $ go tool pprof -http=":8081" [binary] [profile]
+```
+
+# Optimization
+
+### Update findProduct()
+
+```golang
+func findProduct(Products map[string]*Product, code string) Product {
+	if v, ok := Products[code]; ok {
+		return *v
+	}
+
+	return Product{}
+}
+```
+```sh
+$ go test -v -run=^$ -bench=. -benchtime=10s -cpuprofile=prof.cpu -memprofile=prof.mem | tee prof2
+goos: linux
+goarch: amd64
+pkg: github.com/w-bt/benchmark
+BenchmarkHandleProduct-4   	 1000000	     10057 ns/op	    4976 B/op	      63 allocs/op
+PASS
+ok  	github.com/w-bt/benchmark	10.543s
+```
+```sh
+$ benchcmp prof1 prof2
+benchmark                    old ns/op     new ns/op     delta
+BenchmarkHandleProduct-4     3177473       10057         -99.68%
+
+benchmark                    old allocs     new allocs     delta
+BenchmarkHandleProduct-4     63             63             +0.00%
+
+benchmark                    old bytes     new bytes     delta
+BenchmarkHandleProduct-4     4977          4976          -0.02%
+```
+
+### Update Regex
+
+```sh
+$ go test -v -run=^$ -bench=. -benchtime=10s -cpuprofile=prof.cpu -memprofile=prof.mem | tee prof3
+goos: linux
+goarch: amd64
+pkg: github.com/w-bt/benchmark
+BenchmarkHandleProduct-4   	10000000	      2059 ns/op	    1136 B/op	      10 allocs/op
+PASS
+ok  	github.com/w-bt/benchmark	23.041s
+```
+```sh
+$ benchcmp prof2 prof3
+benchmark                    old ns/op     new ns/op     delta
+BenchmarkHandleProduct-4     10057         2059          -79.53%
+
+benchmark                    old allocs     new allocs     delta
+BenchmarkHandleProduct-4     63             10             -84.13%
+
+benchmark                    old bytes     new bytes     delta
+BenchmarkHandleProduct-4     4976          1136          -77.17%
+benchmark                    old ns/op     new ns/op     delta
+BenchmarkHandleProduct-4     10057         2059          -79.53%
+
+benchmark                    old allocs     new allocs     delta
+BenchmarkHandleProduct-4     63             10             -84.13%
+
+benchmark                    old bytes     new bytes     delta
+BenchmarkHandleProduct-4     4976          1136          -77.17%
 ```
