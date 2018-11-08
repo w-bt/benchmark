@@ -117,7 +117,7 @@ ok  	github.com/w-bt/benchmark	2.048s
 ```golang
 func BenchmarkHandleProduct(b *testing.B) {
 	b.ReportAllocs()
-	r, _ := http.ReadRequest(bufio.NewReader(strings.NewReader("GET /product?code=AA11 HTTP/1.0\r\n\r\n")))
+	r, _ := http.ReadRequest(bufio.NewReader(strings.NewReader("GET /product?code=ZZ99 HTTP/1.0\r\n\r\n")))
 	for i := 0; i < b.N; i++ {
 		rw := httptest.NewRecorder()
 		handleProduct(rw, r)
@@ -129,9 +129,9 @@ $ go test -v -run=^$ -bench=. -benchtime=10s -cpuprofile=prof.cpu -memprofile=pr
 goos: linux
 goarch: amd64
 pkg: github.com/w-bt/benchmark
-BenchmarkHandleProduct-4   	    5000	   3220080 ns/op	    4979 B/op	      63 allocs/op
+BenchmarkHandleProduct-4   	    5000	   3177473 ns/op	    4977 B/op	      63 allocs/op
 PASS
-ok  	github.com/w-bt/benchmark	16.782s
+ok  	github.com/w-bt/benchmark	16.610s
 ```
 This command produces 3 new files:
   - binary test (benchmark.test)
@@ -140,52 +140,58 @@ This command produces 3 new files:
 
 Based on the data above, benchmarking is done by +-10s. Detailed result:
   - total execution: 5000 times
-  - duration each operation: 3220080 ns/op
-  - each iteration costs: 4979 bytes with 63 allocations
+  - duration each operation: 3177473 ns/op
+  - each iteration costs: 4977 bytes with 63 allocations
 
 ### CPU Profiling
 ```sh
 $ go tool pprof benchmark.test prof.cpu
 File: benchmark.test
 Type: cpu
-Time: Nov 9, 2018 at 2:57am (WIB)
-Duration: 16.62s, Total samples = 16.54s (99.53%)
+Time: Nov 9, 2018 at 3:10am (WIB)
+Duration: 16.42s, Total samples = 16.40s (99.88%)
 Entering interactive mode (type "help" for commands, "o" for options)
 (pprof) top
-Showing nodes accounting for 16.21s, 98.00% of 16.54s total
-Dropped 64 nodes (cum <= 0.08s)
-Showing top 10 nodes out of 14
+Showing nodes accounting for 15.96s, 97.32% of 16.40s total
+Dropped 74 nodes (cum <= 0.08s)
+Showing top 10 nodes out of 16
       flat  flat%   sum%        cum   cum%
-     8.24s 49.82% 49.82%      8.24s 49.82%  memeqbody
-     4.83s 29.20% 79.02%     16.29s 98.49%  github.com/w-bt/benchmark.findProduct
-     2.87s 17.35% 96.37%      2.99s 18.08%  runtime.mapiternext
-     0.23s  1.39% 97.76%      0.23s  1.39%  runtime.memequal
-     0.04s  0.24% 98.00%      0.09s  0.54%  runtime.scanobject
-         0     0% 98.00%     16.41s 99.21%  github.com/w-bt/benchmark.BenchmarkHandleProduct
-         0     0% 98.00%     16.41s 99.21%  github.com/w-bt/benchmark.handleProduct
-         0     0% 98.00%      0.10s   0.6%  regexp.MatchString
-         0     0% 98.00%      0.09s  0.54%  runtime.gcBgMarkWorker
-         0     0% 98.00%      0.09s  0.54%  runtime.gcBgMarkWorker.func2
+     8.01s 48.84% 48.84%      8.01s 48.84%  memeqbody
+     4.74s 28.90% 77.74%     16.10s 98.17%  github.com/w-bt/benchmark.findProduct
+     3.03s 18.48% 96.22%      3.20s 19.51%  runtime.mapiternext
+     0.15s  0.91% 97.13%      0.15s  0.91%  runtime.memequal
+     0.03s  0.18% 97.32%      0.12s  0.73%  runtime.scanobject
+         0     0% 97.32%     16.23s 98.96%  github.com/w-bt/benchmark.BenchmarkHandleProduct
+         0     0% 97.32%     16.22s 98.90%  github.com/w-bt/benchmark.handleProduct
+         0     0% 97.32%      0.09s  0.55%  regexp.Compile
+         0     0% 97.32%      0.10s  0.61%  regexp.MatchString
+         0     0% 97.32%      0.09s  0.55%  regexp.compile
 (pprof) top5
-Showing nodes accounting for 16.21s, 98.00% of 16.54s total
-Dropped 64 nodes (cum <= 0.08s)
-Showing top 5 nodes out of 14
+Showing nodes accounting for 15.96s, 97.32% of 16.40s total
+Dropped 74 nodes (cum <= 0.08s)
+Showing top 5 nodes out of 16
       flat  flat%   sum%        cum   cum%
-     8.24s 49.82% 49.82%      8.24s 49.82%  memeqbody
-     4.83s 29.20% 79.02%     16.29s 98.49%  github.com/w-bt/benchmark.findProduct
-     2.87s 17.35% 96.37%      2.99s 18.08%  runtime.mapiternext
-     0.23s  1.39% 97.76%      0.23s  1.39%  runtime.memequal
-     0.04s  0.24% 98.00%      0.09s  0.54%  runtime.scanobject
-(pprof) top5 --cum
-Showing nodes accounting for 4.83s, 29.20% of 16.54s total
-Dropped 64 nodes (cum <= 0.08s)
-Showing top 5 nodes out of 14
+     8.01s 48.84% 48.84%      8.01s 48.84%  memeqbody
+     4.74s 28.90% 77.74%     16.10s 98.17%  github.com/w-bt/benchmark.findProduct
+     3.03s 18.48% 96.22%      3.20s 19.51%  runtime.mapiternext
+     0.15s  0.91% 97.13%      0.15s  0.91%  runtime.memequal
+     0.03s  0.18% 97.32%      0.12s  0.73%  runtime.scanobject
+(pprof) top --cum
+Showing nodes accounting for 15.93s, 97.13% of 16.40s total
+Dropped 74 nodes (cum <= 0.08s)
+Showing top 10 nodes out of 16
       flat  flat%   sum%        cum   cum%
-         0     0%     0%     16.42s 99.27%  testing.(*B).runN
-         0     0%     0%     16.41s 99.21%  github.com/w-bt/benchmark.BenchmarkHandleProduct
-         0     0%     0%     16.41s 99.21%  github.com/w-bt/benchmark.handleProduct
-         0     0%     0%     16.40s 99.15%  testing.(*B).launch
-     4.83s 29.20% 29.20%     16.29s 98.49%  github.com/w-bt/benchmark.findProduct
+         0     0%     0%     16.23s 98.96%  github.com/w-bt/benchmark.BenchmarkHandleProduct
+         0     0%     0%     16.23s 98.96%  testing.(*B).launch
+         0     0%     0%     16.23s 98.96%  testing.(*B).runN
+         0     0%     0%     16.22s 98.90%  github.com/w-bt/benchmark.handleProduct
+     4.74s 28.90% 28.90%     16.10s 98.17%  github.com/w-bt/benchmark.findProduct
+     8.01s 48.84% 77.74%      8.01s 48.84%  memeqbody
+     3.03s 18.48% 96.22%      3.20s 19.51%  runtime.mapiternext
+         0     0% 96.22%      0.16s  0.98%  runtime.systemstack
+     0.15s  0.91% 97.13%      0.15s  0.91%  runtime.memequal
+         0     0% 97.13%      0.12s  0.73%  runtime.gcBgMarkWorker
+(pprof)
 ```
 Detailed informations:
   - flat: the duration of direct logic inside the function
@@ -197,28 +203,27 @@ Detailed informations:
 To see detail duration time for each line, execute this code:
 ```sh
 (pprof) list handleProduct
-Total: 16.54s
+Total: 16.40s
 ROUTINE ======================== github.com/w-bt/benchmark.handleProduct in /home/nakama/Code/go/src/github.com/w-bt/benchmark/main.go
-         0     16.41s (flat, cum) 99.21% of Total
-         .          .     17:	http.HandleFunc("/product", handleProduct)
+         0     16.22s (flat, cum) 98.90% of Total
          .          .     18:	log.Fatal(http.ListenAndServe("127.0.0.1:1234", nil))
          .          .     19:}
          .          .     20:
          .          .     21:func handleProduct(w http.ResponseWriter, r *http.Request) {
-         .       10ms     22:	code := r.FormValue("code")
+         .          .     22:	code := r.FormValue("code")
          .      100ms     23:	if match, _ := regexp.MatchString(`^[A-Z]{2}[0-9]{2}$`, code); !match {
          .          .     24:		http.Error(w, "code is invalid", http.StatusBadRequest)
          .          .     25:		return
          .          .     26:	}
          .          .     27:
-         .     16.29s     28:	result := findProduct(products, code)
+         .     16.10s     28:	result := findProduct(products, code)
          .          .     29:
          .          .     30:	if result.Code == "" {
          .          .     31:		http.Error(w, "Data Not Found", http.StatusBadRequest)
          .          .     32:		return
          .          .     33:	}
          .          .     34:
-         .          .     35:	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+         .       10ms     35:	w.Header().Set("Content-Type", "text/html; charset=utf-8")
          .       10ms     36:	w.Write([]byte(`<font size="10">Product Code : ` + result.Code + ` Name :` + result.Name + `</font>`))
          .          .     37:}
          .          .     38:
@@ -226,20 +231,111 @@ ROUTINE ======================== github.com/w-bt/benchmark.handleProduct in /hom
          .          .     40:	for _, item := range Products {
          .          .     41:		if code == (*item).Code {
 (pprof) list findProduct
-Total: 16.54s
+Total: 16.40s
 ROUTINE ======================== github.com/w-bt/benchmark.findProduct in /home/nakama/Code/go/src/github.com/w-bt/benchmark/main.go
-     4.83s     16.29s (flat, cum) 98.49% of Total
+     4.74s     16.10s (flat, cum) 98.17% of Total
          .          .     35:	w.Header().Set("Content-Type", "text/html; charset=utf-8")
          .          .     36:	w.Write([]byte(`<font size="10">Product Code : ` + result.Code + ` Name :` + result.Name + `</font>`))
          .          .     37:}
          .          .     38:
          .          .     39:func findProduct(Products map[string]*Product, code string) Product {
-     300ms      3.29s     40:	for _, item := range Products {
-     4.53s        13s     41:		if code == (*item).Code {
+     230ms      3.43s     40:	for _, item := range Products {
+     4.51s     12.67s     41:		if code == (*item).Code {
          .          .     42:			return *item
          .          .     43:		}
          .          .     44:	}
          .          .     45:
          .          .     46:	return Product{}
+(pprof)
+```
+
+To see in UI form, use `web`
+
+![pprof](./pprof003.svg)
+<img src="./pprof003.svg">
+
+### Memory Profiling
+
+Similar with CPU Profiling, execute this command
+```sh
+go tool pprof --alloc_space benchmark.test prof.mem
+File: benchmark.test
+Type: alloc_space
+Time: Nov 9, 2018 at 3:11am (WIB)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) top --cum
+Showing nodes accounting for 27.39MB, 48.86% of 56.07MB total
+Showing top 10 nodes out of 61
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%    32.61MB 58.17%  runtime.main
+   26.39MB 47.07% 47.07%    30.89MB 55.10%  github.com/w-bt/benchmark.GenerateProduct
+         0     0% 47.07%    21.50MB 38.35%  github.com/w-bt/benchmark.BenchmarkHandleProduct
+         0     0% 47.07%    21.50MB 38.35%  testing.(*B).launch
+         0     0% 47.07%    21.50MB 38.35%  testing.(*B).runN
+       1MB  1.78% 48.86%    20.50MB 36.57%  github.com/w-bt/benchmark.handleProduct
+         0     0% 48.86%    19.76MB 35.25%  github.com/w-bt/benchmark.TestMain
+         0     0% 48.86%    19.76MB 35.25%  main.main
+         0     0% 48.86%       16MB 28.54%  regexp.MatchString
+         0     0% 48.86%    14.50MB 25.86%  regexp.Compile
+(pprof) list handleProduct
+Total: 56.07MB
+ROUTINE ======================== github.com/w-bt/benchmark.handleProduct in /home/nakama/Code/go/src/github.com/w-bt/benchmark/main.go
+       1MB    20.50MB (flat, cum) 36.57% of Total
+         .          .     18:	log.Fatal(http.ListenAndServe("127.0.0.1:1234", nil))
+         .          .     19:}
+         .          .     20:
+         .          .     21:func handleProduct(w http.ResponseWriter, r *http.Request) {
+         .          .     22:	code := r.FormValue("code")
+         .       16MB     23:	if match, _ := regexp.MatchString(`^[A-Z]{2}[0-9]{2}$`, code); !match {
+         .          .     24:		http.Error(w, "code is invalid", http.StatusBadRequest)
+         .          .     25:		return
+         .          .     26:	}
+         .          .     27:
+         .          .     28:	result := findProduct(products, code)
+         .          .     29:
+         .          .     30:	if result.Code == "" {
+         .          .     31:		http.Error(w, "Data Not Found", http.StatusBadRequest)
+         .          .     32:		return
+         .          .     33:	}
+         .          .     34:
+         .        2MB     35:	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+       1MB     2.50MB     36:	w.Write([]byte(`<font size="10">Product Code : ` + result.Code + ` Name :` + result.Name + `</font>`))
+         .          .     37:}
+         .          .     38:
+         .          .     39:func findProduct(Products map[string]*Product, code string) Product {
+         .          .     40:	for _, item := range Products {
+         .          .     41:		if code == (*item).Code {
+(pprof) list MatchString
+Total: 56.07MB
+ROUTINE ======================== regexp.(*Regexp).MatchString in /usr/local/go/src/regexp/regexp.go
+         0     1.50MB (flat, cum)  2.68% of Total
+         .          .    436:}
+         .          .    437:
+         .          .    438:// MatchString reports whether the string s
+         .          .    439:// contains any match of the regular expression re.
+         .          .    440:func (re *Regexp) MatchString(s string) bool {
+         .     1.50MB    441:	return re.doMatch(nil, nil, s)
+         .          .    442:}
+         .          .    443:
+         .          .    444:// Match reports whether the byte slice b
+         .          .    445:// contains any match of the regular expression re.
+         .          .    446:func (re *Regexp) Match(b []byte) bool {
+ROUTINE ======================== regexp.MatchString in /usr/local/go/src/regexp/regexp.go
+         0       16MB (flat, cum) 28.54% of Total
+         .          .    460:
+         .          .    461:// MatchString reports whether the string s
+         .          .    462:// contains any match of the regular expression pattern.
+         .          .    463:// More complicated queries need to use Compile and the full Regexp interface.
+         .          .    464:func MatchString(pattern string, s string) (matched bool, err error) {
+         .    14.50MB    465:	re, err := Compile(pattern)
+         .          .    466:	if err != nil {
+         .          .    467:		return false, err
+         .          .    468:	}
+         .     1.50MB    469:	return re.MatchString(s), nil
+         .          .    470:}
+         .          .    471:
+         .          .    472:// MatchString reports whether the byte slice b
+         .          .    473:// contains any match of the regular expression pattern.
+         .          .    474:// More complicated queries need to use Compile and the full Regexp interface.
 (pprof)
 ```
