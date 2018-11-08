@@ -251,8 +251,7 @@ ROUTINE ======================== github.com/w-bt/benchmark.findProduct in /home/
 
 To see in UI form, use `web`
 
-![pprof](./pprof003.svg)
-<img src="./pprof003.svg">
+![cpu profile](./pprof003.svg)
 
 ### Memory Profiling
 
@@ -337,5 +336,6 @@ ROUTINE ======================== regexp.MatchString in /usr/local/go/src/regexp/
          .          .    472:// MatchString reports whether the byte slice b
          .          .    473:// contains any match of the regular expression pattern.
          .          .    474:// More complicated queries need to use Compile and the full Regexp interface.
-(pprof)
+(pprof) web handleProduct
 ```
+![mem profile](./pprof004.svg)
