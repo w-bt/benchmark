@@ -385,6 +385,15 @@ BenchmarkHandleProduct-4     4977          4976          -0.02%
 
 ### Update Regex
 
+Compile regex first
+```golang
+	codeRegex = regexp.MustCompile(`^[A-Z]{2}[0-9]{2}$`)
+	// . . .
+	if match := codeRegex.MatchString(code); !match {
+		// . . .
+	}
+```
+
 ```sh
 $ go test -v -run=^$ -bench=. -benchtime=10s -cpuprofile=prof.cpu -memprofile=prof.mem | tee prof3
 goos: linux
