@@ -447,7 +447,7 @@ Type: alloc_space
 Time: Nov 9, 2018 at 4:17am (WIB)
 Entering interactive mode (type "help" for commands, "o" for options)
 (pprof) list handleP
-Total: 11.53GB
+Total: 56.07MB
 ROUTINE ======================== github.com/w-bt/benchmark.handleProduct in /home/nakama/Code/go/src/github.com/w-bt/benchmark/main.go
     1.29GB     9.22GB (flat, cum) 79.97% of Total
          .          .     34:		http.Error(w, "Data Not Found", http.StatusBadRequest)
@@ -455,7 +455,7 @@ ROUTINE ======================== github.com/w-bt/benchmark.handleProduct in /hom
          .          .     36:	}
          .          .     37:
          .          .     38:	// w.Header().Set("Content-Type", "text/html; charset=utf-8")
-    1.29GB     9.22GB     39:	w.Write([]byte(`<font size="10">Product Code : ` + result.Code + ` Name :` + result.Name + `</font>`))
+    	1MB     2.5MB     39:	w.Write([]byte(`<font size="10">Product Code : ` + result.Code + ` Name :` + result.Name + `</font>`))
          .          .     40:}
          .          .     41:
          .          .     42:func findProduct(Products map[string]*Product, code string) Product {
